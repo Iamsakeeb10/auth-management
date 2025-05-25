@@ -1,6 +1,7 @@
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import React, {useState} from 'react';
 import {Button, StyleSheet, Text, TextInput, View} from 'react-native';
+import {sendVerificationCode} from '../services/api/auth';
 import {AuthStackParamList} from '../types/AuthStack.types';
 
 type Props = NativeStackScreenProps<AuthStackParamList, 'Register'>;
@@ -14,16 +15,28 @@ const RegisterScreen: React.FC<Props> = ({navigation}) => {
     setError('');
   };
 
-  const handleRegister = () => {
+  const handleRegister = async () => {
     const {name, email, password} = form;
     if (!name || !email || !password) {
       setError('All fields are required.');
       return;
     }
 
-    // You can add regex/email format validation here if needed
+    try {
+      const data = await sendVerificationCode(email);
 
-    navigation.navigate('Login');
+      if (data?.message) {
+        navigation.navigate('Verification', {
+          form,
+        });
+      }
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        setError(error.message);
+      } else {
+        setError('Something went wrong');
+      }
+    }
   };
 
   return (

@@ -1,25 +1,51 @@
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import React, {useState} from 'react';
-import {Button, StyleSheet, Text, TextInput, View} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {
+  ActivityIndicator,
+  Alert,
+  Button,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from 'react-native';
+import {useDispatch, useSelector} from 'react-redux';
+import {login} from '../redux/slices/authSlice';
+import {AppDispatch, RootState} from '../redux/store/store'; // Make sure RootState is correctly typed
 import {AuthStackParamList} from '../types/AuthStack.types';
 
 type Props = NativeStackScreenProps<AuthStackParamList, 'Login'>;
 
 const LoginScreen: React.FC<Props> = ({navigation}) => {
-  const [form, setForm] = useState({email: '', password: ''});
-  const [error, setError] = useState('');
+  const [form, setForm] = useState({
+    email: 'test2@gmail.com',
+    password: '12345678',
+  });
+
+  const dispatch = useDispatch<AppDispatch>();
+
+  // Select loading and error from auth slice
+  const {loading, error} = useSelector((state: RootState) => state.auth);
+
+  // Optional: Show alert if error changes
+  useEffect(() => {
+    if (error) {
+      Alert.alert('Login Failed', error);
+    }
+  }, [error]);
 
   const handleChange = (field: string, value: string) => {
     setForm({...form, [field]: value});
-    setError('');
   };
 
   const handleLogin = () => {
     const {email, password} = form;
+
     if (!email || !password) {
-      setError('Both fields are required.');
+      Alert.alert('Error', 'Please enter email and password');
       return;
     }
+    dispatch(login({email, password}));
   };
 
   return (
@@ -32,7 +58,9 @@ const LoginScreen: React.FC<Props> = ({navigation}) => {
         value={form.email}
         onChangeText={text => handleChange('email', text)}
         keyboardType="email-address"
+        autoCapitalize="none"
       />
+
       <TextInput
         placeholder="Password"
         style={styles.input}
@@ -41,9 +69,15 @@ const LoginScreen: React.FC<Props> = ({navigation}) => {
         secureTextEntry
       />
 
+      {loading ? (
+        <ActivityIndicator size="large" color="#0000ff" style={{margin: 20}} />
+      ) : (
+        <Button title="Login" onPress={handleLogin} />
+      )}
+
+      {/* Show error below the button (optional) */}
       {error ? <Text style={styles.error}>{error}</Text> : null}
 
-      <Button title="Login" onPress={handleLogin} />
       <Text style={styles.link} onPress={() => navigation.navigate('Register')}>
         Don't have an account? Register
       </Text>
@@ -68,6 +102,6 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     borderRadius: 6,
   },
-  error: {color: 'red', marginBottom: 10},
+  error: {color: 'red', marginTop: 10, textAlign: 'center'},
   link: {marginTop: 20, color: 'blue', textAlign: 'center'},
 });
