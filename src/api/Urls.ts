@@ -10,6 +10,7 @@ const getUrls = async () => {
     sendVerificationCode: `${apiHost}/users/verification-code`,
     registration: `${apiHost}/users/customers/registration`,
     login: `${apiHost}/users/login`,
+    profile: `${apiHost}/users/customers/profile`,
   };
 };
 
