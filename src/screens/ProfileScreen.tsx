@@ -2,14 +2,18 @@ import React, {useEffect, useState} from 'react';
 import {ActivityIndicator, StyleSheet, Text, View} from 'react-native';
 import {useSelector} from 'react-redux';
 import {RootState} from '../redux/store/store';
-import {getUserProfile} from '../services/api/profile';
+import {getUserProfile} from '../services/api/auth';
 
 const ProfileScreen = () => {
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const {accessToken} = useSelector((state: RootState) => state.auth);
+  const {accessToken, refreshToken} = useSelector(
+    (state: RootState) => state.auth,
+  );
+
+  console.log('Profile =>>', refreshToken);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -18,7 +22,7 @@ const ProfileScreen = () => {
         setError('');
         if (!accessToken) return;
 
-        const data = await getUserProfile(accessToken);
+        const data = await getUserProfile();
         console.log('Profile Data =>>', data);
         setProfile(data);
       } catch (err: any) {

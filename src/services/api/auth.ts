@@ -1,29 +1,16 @@
 import axios from 'axios';
+import axiosInstance from '../../api/axiosConfig';
 import getUrls from '../../api/Urls';
 import {encodedString} from '../../utils/utils';
 
 export const sendVerificationCode = async (entity: string): Promise<any> => {
   const urls = await getUrls();
 
-  try {
-    const response = await axios.post(
-      urls.sendVerificationCode,
-      {verification_entity: entity},
-      {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      },
-    );
+  const response = await axiosInstance.post(urls.sendVerificationCode, {
+    verification_entity: entity,
+  });
 
-    return response.data;
-  } catch (err: unknown) {
-    if (axios.isAxiosError(err)) {
-      throw new Error(err.response?.data?.message || 'Verification failed');
-    } else {
-      throw new Error('Unknown error occurred');
-    }
-  }
+  return response.data;
 };
 
 export const verifyAndRegistration = async ({
@@ -37,36 +24,19 @@ export const verifyAndRegistration = async ({
   password: string;
   code: number;
 }): Promise<string | undefined> => {
-  try {
-    const urls = await getUrls();
-    const registrationUrl = urls.registration;
+  const urls = await getUrls();
+  const registrationUrl = urls.registration;
 
-    const encodedPassword = encodedString(password);
+  const encodedPassword = encodedString(password);
 
-    const response = await axios.post(registrationUrl, {
-      name,
-      email,
-      password: encodedPassword,
-      verification_code: code,
-    });
+  const response = await axiosInstance.post(registrationUrl, {
+    name,
+    email,
+    password: encodedPassword,
+    verification_code: code,
+  });
 
-    if (response && response.data) {
-      return response.data.message;
-    }
-
-    throw new Error('Something went wrong.');
-  } catch (error: any) {
-    console.log('❌ Registration error:', error);
-    console.log('📦 Error response:', error?.response);
-    console.log(
-      '💬 Error message:',
-      error?.response?.data?.message || error?.message,
-    );
-
-    throw (
-      error?.response?.data?.message || error?.message || 'Something went wrong'
-    );
-  }
+  return response.data?.message;
 };
 
 export const loginUser = async ({
@@ -76,38 +46,29 @@ export const loginUser = async ({
   email: string;
   password: string;
 }): Promise<any> => {
-  try {
-    const urls = await getUrls();
-    const loginUrl = urls.login;
+  const urls = await getUrls();
+  const loginUrl = urls.login;
 
-    const encodedPassword = encodedString(password);
+  const encodedPassword = encodedString(password);
 
-    const response = await axios.post(
-      loginUrl,
-      {
-        user_id: email,
-        password: encodedPassword,
-      },
-      {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      },
-    );
+  const response = await axiosInstance.post(loginUrl, {
+    user_id: email,
+    password: encodedPassword,
+  });
 
-    if (response && response.data) {
-      return response.data;
-    }
+  return response.data;
+};
 
-    throw new Error('Login failed.');
-  } catch (error: any) {
-    console.log('❌ Login error:', error);
-    console.log('📦 Error response:', error?.response);
-    console.log(
-      '💬 Error message:',
-      error?.response?.data?.message || error?.message,
-    );
+export const getUserProfile = async (): Promise<any> => {
+  const urls = await getUrls();
+  const response = await axiosInstance.get(urls.profile);
+  return response.data;
+};
 
-    throw error?.response?.data?.message || error?.message || 'Login failed';
-  }
+export const refreshAccessToken = async (refreshToken: string) => {
+  const urls = await getUrls();
+  const response = await axios.post(urls.refreshToken, {
+    refresh_token: refreshToken,
+  });
+  return response.data;
 };

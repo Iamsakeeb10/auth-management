@@ -11,6 +11,7 @@ const getUrls = async () => {
     registration: `${apiHost}/users/customers/registration`,
     login: `${apiHost}/users/login`,
     profile: `${apiHost}/users/customers/profile`,
+    refreshToken: `${apiHost}/users/refresh-token`,
   };
 };
 

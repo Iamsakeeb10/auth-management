@@ -30,7 +30,7 @@ const LoginScreen: React.FC<Props> = ({navigation}) => {
   // Optional: Show alert if error changes
   useEffect(() => {
     if (error) {
-      Alert.alert('Login Failed', error);
+      Alert.alert('Login Failed', error.toString());
     }
   }, [error]);
 
@@ -76,7 +76,7 @@ const LoginScreen: React.FC<Props> = ({navigation}) => {
       )}
 
       {/* Show error below the button (optional) */}
-      {error ? <Text style={styles.error}>{error}</Text> : null}
+      {error ? <Text style={styles.error}>{error.toString()}</Text> : null}
 
       <Text style={styles.link} onPress={() => navigation.navigate('Register')}>
         Don't have an account? Register
