@@ -1,43 +1,15 @@
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import axios from 'axios';
-import React, {useEffect} from 'react';
+import React from 'react';
 import {Button, StyleSheet, Text, View} from 'react-native';
-import {useDispatch, useSelector} from 'react-redux';
-import getUrls from '../api/Urls';
+import {useDispatch} from 'react-redux';
 import {logout} from '../redux/slices/authSlice';
-import {AppDispatch, RootState} from '../redux/store/store';
+import {AppDispatch} from '../redux/store/store';
 import {AppStackParamList} from '../types/AppStack.type';
 
 type Props = NativeStackScreenProps<AppStackParamList, 'Home'>;
 
 const HomeScreen: React.FC<Props> = ({navigation}) => {
   const dispatch = useDispatch<AppDispatch>();
-
-  const {refreshToken} = useSelector((state: RootState) => state.auth);
-
-  // Add this in your component after successful login for testing
-  // This is just for debugging - remove after finding the root cause
-
-  useEffect(() => {
-    refreshAccessToken();
-  }, []);
-
-  const refreshAccessToken = async () => {
-    const urls = await getUrls();
-    try {
-      const response = await axios.post(urls.refreshToken, {
-        refresh_token: refreshToken,
-      });
-      if (response.data) {
-        console.log('Refresh Token =>>', response.data);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  // Call this after login to test if refresh logic works
-  // testTokenRefresh();
 
   return (
     <View style={styles.container}>
